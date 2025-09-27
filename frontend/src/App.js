@@ -4,6 +4,7 @@ import Homepag from "./Homepag";        // default landing page
 import Homepage from "./Homepage";      // full homepage after Get Started
 import ComparisonPage from "./ComparisonPage";
 import Thred from "./Thred";
+import Chatbot from "./chatbot";
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/dashboard" element={<Homepage />} />
         <Route path="/compare" element={<ComparisonPage />} />
         <Route path="/3d-profile" element={<Thred />} />
+        <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
     </Router>
   );
