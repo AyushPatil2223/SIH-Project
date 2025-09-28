@@ -1,10 +1,20 @@
+
 from fastapi import FastAPI, UploadFile, File, HTTPException,Query
+
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query
+>>>>>>> d68ac5b (Add ReportButton PDF export, update Homepage and backend report generator)
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, StreamingResponse
+import matplotlib.pyplot as plt
 import tempfile
 import xarray as xr
 import numpy as np
 import pandas as pd
 import os
+import io
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 
 
@@ -46,10 +56,9 @@ if os.path.exists(NC_FILE):
                 "time": str(t)
             })
 
+# --- Existing endpoints ---
 @app.get("/profiles")
 def list_profiles():
-    if not profiles:
-        return {"profiles": [], "n_profiles": 0}
     return {"profiles": profiles, "n_profiles": len(profiles)}
 
 @app.get("/profile/{index}")
@@ -168,24 +177,86 @@ async def upload_file(file: UploadFile = File(...)):
         pressure = ds_uploaded["PRES_ADJUSTED"][0, :].values if "PRES_ADJUSTED" in ds_uploaded else []
 
         min_len = min(len(depth), len(temperature), len(salinity), len(pressure))
-        depth_vals = sanitize_array(depth[:min_len])
-        temperature_vals = sanitize_array(temperature[:min_len])
-        salinity_vals = sanitize_array(salinity[:min_len])
-        pressure_vals = sanitize_array(pressure[:min_len])
-
         return {
-            "depth": depth_vals,
-            "temperature": temperature_vals,
-            "salinity": salinity_vals,
-            "pressure": pressure_vals
+            "depth": sanitize_array(depth[:min_len]),
+            "temperature": sanitize_array(temperature[:min_len]),
+            "salinity": sanitize_array(salinity[:min_len]),
+            "pressure": sanitize_array(pressure[:min_len])
         }
     except Exception as e:
-        print("Upload error:", e)
         return {"error": str(e)}
 
+<<<<<<< HEAD
 @app.get("/variables")
 def list_variables():
     """List all variables in the loaded NetCDF file"""
     if ds is None:
         raise HTTPException(status_code=500, detail="No dataset loaded")
     return {"variables": list(ds.variables.keys())}
+=======
+# --- PDF report generation ---
+from fastapi import Body
+
+@app.post("/generate_report")
+def generate_report(data: dict = Body(...)):
+    """
+    Expects JSON body:
+    {
+        "depths": [...],
+        "temps": [...],
+        "max_temp": float,
+        "min_temp": float,
+        "lat": float,
+        "lon": float
+    }
+    """
+    depths = data.get("depths", [])
+    temps = data.get("temps", [])
+    max_temp = data.get("max_temp")
+    min_temp = data.get("min_temp")
+    lat = data.get("lat")
+    lon = data.get("lon")
+
+    if not depths or not temps or len(depths) != len(temps):
+        raise HTTPException(status_code=400, detail="Depths and temps must be non-empty and of same length")
+
+    # 1️⃣ Create plot
+    plt.figure(figsize=(6,4))
+    plt.plot(temps, depths, marker='o')
+    plt.gca().invert_yaxis()
+    plt.xlabel("Temperature (°C)")
+    plt.ylabel("Depth (m)")
+    plt.title(f"Temperature vs Depth at ({lat}, {lon})")
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='PNG')
+    plt.close()
+    buf.seek(0)
+
+    # 2️⃣ Create PDF
+    pdf_buffer = io.BytesIO()
+    c = canvas.Canvas(pdf_buffer, pagesize=letter)
+    width, height = letter
+
+    # Title
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, height - 50, "Ocean Data Report")
+
+    # Metadata
+    c.setFont("Helvetica", 12)
+    c.drawString(50, height - 80, f"Latitude: {lat}, Longitude: {lon}")
+    c.drawString(50, height - 100, f"Max Temp: {max_temp}°C, Min Temp: {min_temp}°C")
+
+    # Draw plot
+    c.drawImage(buf, 50, height - 400, width=500, height=300)
+
+    c.showPage()
+    c.save()
+    pdf_buffer.seek(0)
+
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "inline; filename=report.pdf"}
+    )
+>>>>>>> d68ac5b (Add ReportButton PDF export, update Homepage and backend report generator)
