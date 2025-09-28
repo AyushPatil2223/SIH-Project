@@ -5,6 +5,7 @@ import Homepage from "./Homepage";      // full homepage after Get Started
 import ComparisonPage from "./ComparisonPage";
 import Thred from "./Thred";
 import Chatbot from "./chatbot";
+import Table from "./table";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/compare" element={<ComparisonPage />} />
         <Route path="/3d-profile" element={<Thred />} />
         <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/table" element={<Table />} />
       </Routes>
     </Router>
   );

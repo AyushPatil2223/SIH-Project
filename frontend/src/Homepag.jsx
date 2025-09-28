@@ -146,6 +146,13 @@ const Header = () => {
                 >
                   Chatbot
                 </Link>
+                <Link
+                  to="/table"
+                  className="block px-4 py-2 text-[#0B3D91] hover:bg-[#E0F7FA] transition"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  AGRO data
+                </Link>
               </div>
             )}
           </div>
