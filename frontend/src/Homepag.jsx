@@ -226,17 +226,17 @@ const Oceans = () => {
   const oceans = [
     {
       name: "Atlantic Ocean",
-      desc: "Explore data, currents, and temperature trends of the Atlantic Ocean.",
+      desc: "The Atlantic Ocean stretches between the Americas and Europe-Africa, making it the second-largest ocean in the world. Its waters include the Mid-Atlantic Ridge, a vast underwater mountain range, and the Sargasso Sea, known for its calm waters and floating seaweed. Major rivers such as the Amazon and Mississippi flow into the Atlantic, shaping its marine ecosystems.",
       img: "/images/atlanticocean.jpg",
     },
     {
       name: "Pacific Ocean",
-      desc: "Visualize real-time measurements and patterns in the Pacific Ocean.",
+      desc: "The Pacific Ocean is the largest and deepest ocean, spanning from Asia and Australia to the Americas. It contains the Mariana Trench, the deepest point on Earth, and lies along the 'Ring of Fire,' known for frequent earthquakes and volcanic activity. Numerous tropical islands, including Hawaii and Fiji, dot its vast expanse of waters.",
       img: "/images/pacificocean.jpg",
     },
     {
       name: "Indian Ocean",
-      desc: "Analyze salinity, pressure, and temperature profiles in the Indian Ocean.",
+      desc: "The Indian Ocean lies between Africa, Asia, and Australia, making it the third-largest ocean on Earth. Its warm waters influence monsoon winds and tropical climates, supporting rich biodiversity and coral reefs like those in the Maldives. Key rivers like the Ganges and Zambezi flow into it, and it serves as a vital route for global maritime trade.",
       img: "/images/indianocean.jpg",
     },
   ];
@@ -258,9 +258,7 @@ const Oceans = () => {
               />
               <CardTitle>{ocean.name}</CardTitle>
               <CardDescription>{ocean.desc}</CardDescription>
-              <Button variant="ocean" size="sm" className="mt-4">
-                Take Your Idea
-              </Button>
+            
             </CardContent>
           </Card>
         ))}
@@ -271,7 +269,7 @@ const Oceans = () => {
 
 const Gallery = () => (
   <section id="gallery" className={cn("py-20 text-center", COLORS.paleBlue)}>
-    <h2 className={cn("text-3xl font-bold mb-12", COLORS.accent)}>Gallery</h2>
+    <h2 className={cn("text-3xl font-bold mb-12", COLORS.accent)}>Demo</h2>
     <div className="flex flex-wrap justify-center gap-8">
       <img
         src="/images/gallery1.jpg"
@@ -282,11 +280,6 @@ const Gallery = () => (
         src="/images/gallery2.jpg"
         alt="Gallery 2"
         className="w-96 h-64 md:w-[500px] md:h-[350px] object-cover rounded-xl shadow-lg border-4 border-[#D6CDAF]/20"
-      />
-      <img
-        src="/images/gallery3.jpg"
-        alt="Gallery 3"
-        className="w-96 h-64 md:w-[500px] md object-cover rounded-xl shadow-lg border-4 border-[#D6CDAF]/20"
       />
     </div>
   </section>

@@ -1,5 +1,10 @@
 
 from fastapi import FastAPI, UploadFile, File, HTTPException,Query
+
+
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query
+
+>>>>>>> 91fa74f (Fix Homepag.jsx quotes and update Thred.jsx and backend)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 import matplotlib.pyplot as plt
@@ -159,30 +164,74 @@ def get_all_profiles_table(page: int = 1, rows_per_page: int = 50):
     }
 
 
-
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
+    """
+    Upload .nc file and return 1D arrays along n_levels:
+    - depth (n_levels)
+    - temperature (first profile)
+    - salinity (first profile)
+    - pressure (first profile)
+    """
     try:
+        # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix=".nc") as tmp:
             tmp.write(await file.read())
             tmp_path = tmp.name
 
-        ds_uploaded = xr.open_dataset(tmp_path)
-        depth = ds_uploaded["PRES_ADJUSTED"][0, :].values if "PRES_ADJUSTED" in ds_uploaded else []
-        temperature = ds_uploaded["TEMP_ADJUSTED"][0, :].values if "TEMP_ADJUSTED" in ds_uploaded else []
-        salinity = ds_uploaded["PSAL_ADJUSTED"][0, :].values if "PSAL_ADJUSTED" in ds_uploaded else []
-        pressure = ds_uploaded["PRES_ADJUSTED"][0, :].values if "PRES_ADJUSTED" in ds_uploaded else []
+        # Open dataset
+        ds = xr.open_dataset(tmp_path)
+        print("Variables in dataset:", list(ds.variables.keys()))
 
-        min_len = min(len(depth), len(temperature), len(salinity), len(pressure))
+        # Extract variables
+        depth = ds["n_levels"] if "n_levels" in ds.dims else None
+        temperature = ds["temp_adjusted"] if "temp_adjusted" in ds.variables else None
+        salinity = ds["psal_adjusted"] if "psal_adjusted" in ds.variables else None
+        pressure = ds["pres_adjusted"] if "pres_adjusted" in ds.variables else None
+
+        # Extract depth values (1D)
+        depth_vals = list(range(ds.dims["n_levels"])) if "n_levels" in ds.dims else []
+
+        # Extract first profile for temperature, salinity, pressure
+        def extract_first_profile(var):
+            if var is None:
+                return []
+            # If variable has n_prof dimension, select first profile
+            if "n_prof" in var.dims:
+                return var.isel(n_prof=0).values.tolist()
+            return var.values.tolist()
+
+        temperature_vals = extract_first_profile(temperature)
+        salinity_vals = extract_first_profile(salinity)
+        pressure_vals = extract_first_profile(pressure)
+
+        # Ensure all arrays have same length
+        min_len = min(len(depth_vals), len(temperature_vals), len(salinity_vals), len(pressure_vals))
+        depth_vals = depth_vals[:min_len]
+        temperature_vals = temperature_vals[:min_len]
+        salinity_vals = salinity_vals[:min_len]
+        pressure_vals = pressure_vals[:min_len]
+
         return {
-            "depth": sanitize_array(depth[:min_len]),
-            "temperature": sanitize_array(temperature[:min_len]),
-            "salinity": sanitize_array(salinity[:min_len]),
-            "pressure": sanitize_array(pressure[:min_len])
+            "depth": depth_vals,
+            "temperature": temperature_vals,
+            "salinity": salinity_vals,
+            "pressure": pressure_vals
         }
-    except Exception as e:
-        return {"error": str(e)}
 
+    except Exception as e:
+        print("Upload error:", e)
+        return {"error": str(e)}           
+
+
+@app.get("/variables")
+def list_variables():
+    """List all variables in the loaded NetCDF file"""
+    if ds is None:
+        raise HTTPException(status_code=500, detail="No dataset loaded")
+    return {"variables": list(ds.variables.keys())}
+
+>>>>>>> 91fa74f (Fix Homepag.jsx quotes and update Thred.jsx and backend)
 # --- PDF report generation ---
 from fastapi import Body
 
