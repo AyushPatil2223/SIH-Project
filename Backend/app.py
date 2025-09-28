@@ -1,8 +1,5 @@
 
 from fastapi import FastAPI, UploadFile, File, HTTPException,Query
-
-from fastapi import FastAPI, UploadFile, File, HTTPException, Query
->>>>>>> d68ac5b (Add ReportButton PDF export, update Homepage and backend report generator)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 import matplotlib.pyplot as plt
@@ -186,14 +183,6 @@ async def upload_file(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": str(e)}
 
-<<<<<<< HEAD
-@app.get("/variables")
-def list_variables():
-    """List all variables in the loaded NetCDF file"""
-    if ds is None:
-        raise HTTPException(status_code=500, detail="No dataset loaded")
-    return {"variables": list(ds.variables.keys())}
-=======
 # --- PDF report generation ---
 from fastapi import Body
 
@@ -259,4 +248,3 @@ def generate_report(data: dict = Body(...)):
         media_type="application/pdf",
         headers={"Content-Disposition": "inline; filename=report.pdf"}
     )
->>>>>>> d68ac5b (Add ReportButton PDF export, update Homepage and backend report generator)
