@@ -18,5 +18,5 @@ cd..
 
 # Setup frontend
 cd frontend
-npm install
+npm install or npm i
 npm start
